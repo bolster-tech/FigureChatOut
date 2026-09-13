@@ -53,6 +53,11 @@
   let reconnectTimer = null;
   let audioCtx = null;
 
+  const roomCode = (() => {
+    const requestedRoom = (new URLSearchParams(window.location.search).get('room') || '').trim();
+    return /^[A-Za-z0-9_-]{1,64}$/.test(requestedRoom) ? requestedRoom : 'lobby';
+  })();
+
   // Starter 8 words matching 2x4 grid layout
   let currentWords = ['DRAYCO', 'GAMESHOW', 'FIGURE', 'CHAT', 'OUT', 'SECRET', 'PHRASE', 'REVEAL'];
 
@@ -203,7 +208,11 @@
     }
 
     ws.onopen = () => {
-      console.log('Host connected to WebSocket at', wsUrl);
+      console.log(`Host connected to WebSocket at ${wsUrl} in room ${roomCode}`);
+      ws.send(JSON.stringify({
+        action: 'join-room',
+        roomCode
+      }));
       updateConnectionStatus('connected');
       broadcastPanelists();
       broadcastContestant();
@@ -239,7 +248,11 @@
       return false;
     }
 
-    const jsonString = JSON.stringify(payload);
+    const outgoingPayload = {
+      ...payload,
+      roomCode
+    };
+    const jsonString = JSON.stringify(outgoingPayload);
     ws.send(jsonString);
 
     if (lastSentPayload) {

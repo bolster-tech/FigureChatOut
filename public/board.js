@@ -15,6 +15,11 @@
   let reconnectTimer = null;
   let audioCtx = null;
 
+  const roomCode = (() => {
+    const requestedRoom = new URLSearchParams(window.location.search).get('room');
+    return (requestedRoom || 'lobby').trim().slice(0, 64) || 'lobby';
+  })();
+
   // Default starter words: 8 words total for the 2x4 grid layout
   let currentWords = ['DRAYCO', 'GAMESHOW', 'FIGURE', 'CHAT', 'OUT', 'SECRET', 'PHRASE', 'REVEAL'];
 
@@ -442,6 +447,7 @@
   function handleMessage(event) {
     try {
       const data = JSON.parse(event.data);
+      if (data.roomCode && data.roomCode !== roomCode) return;
       console.log('Board received payload:', data);
 
       switch (data.action) {
@@ -529,7 +535,11 @@
     }
 
     ws.onopen = () => {
-      console.log('Board overlay connected to WebSocket at', wsUrl);
+      console.log(`Board overlay connected to WebSocket at ${wsUrl} in room ${roomCode}`);
+      ws.send(JSON.stringify({
+        action: 'join-room',
+        roomCode
+      }));
       updateStatus('connected');
     };
 
