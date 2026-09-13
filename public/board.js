@@ -307,9 +307,9 @@
       `;
 
       // Interactive preview toggle
-      row.addEventListener('click', () => {
-        toggleReveal(boxNumber);
-      });
+row.addEventListener('click', () => {
+  // Click events are disabled on the board tiles
+});
 
       gameBoard.appendChild(row);
     }
