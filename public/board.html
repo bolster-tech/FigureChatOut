@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drayco Gameshow - Figure Chat Out</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="board.css">
+</head>
+<body>
+  <main class="board-wrapper">
+    <!-- Top Stage Header: Branding -->
+    <header class="stage-header">
+      <div class="header-left">
+        <div class="marquee-tag">DRAYCO GAMESHOW</div>
+        <h1 class="marquee-title">FIGURE CHAT OUT</h1>
+      </div>
+      <aside class="clue-box" id="clueBox" aria-live="polite" aria-label="Active word hint">
+        <div class="clue-label">WORD HINT</div>
+        <div class="clue-text" id="boardWordHint">WAITING FOR HOST CLUE</div>
+      </aside>
+    </header>
+
+    <!-- 4-Panelist Active Turn Tracker -->
+    <section class="panelist-roster-container" id="panelistRosterContainer" aria-label="Stream Panelists">
+      <div class="panelist-section-label">PANELISTS:</div>
+      <div class="panelist-roster" id="panelistRoster">
+        <!-- Rendered dynamically by board.js -->
+      </div>
+    </section>
+
+    <!-- 2x4 Word Board (2 rows by 4 columns, up to 8 words) -->
+    <section class="game-board-container" aria-label="Word Board">
+      <div class="game-board grid-2x4" id="gameBoard" role="region" aria-label="Secret Word Tiles">
+        <!-- Rendered dynamically by board.js in 2 rows x 4 columns -->
+      </div>
+    </section>
+
+    <!-- Bottom HUD: Contestant Info & Timer -->
+    <footer class="bottom-hud">
+      <!-- Contestant Box (Bottom-Left) -->
+      <div class="contestant-box" id="contestantBox" role="region" aria-label="Contestant Clue Info">
+        <div class="hud-label">CURRENT CHATTER</div>
+        <div class="contestant-content">
+          <strong id="boardChatterName" class="chatter-name">@Chatter</strong>
+          <div class="secret-action">
+            <span class="action-status" id="boardCategoryHint">SECRET PHRASE</span>
+            <button class="reveal-btn" style="display: none;">REVEAL</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Connection Status (Bottom-Center) -->
+      <div class="status-badge" id="boardStatus" aria-live="polite">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">LIVE</span>
+      </div>
+
+      <!-- Timer Box (Bottom-Right) -->
+      <div class="timer-box" id="boardTimerBadge">
+        <div class="hud-label">ROUND TIME LEFT:</div>
+        <div class="timer-display" id="boardTimerText">0:60</div>
+      </div>
+    </footer>
+  </main>
+
+  <script src="board.js" defer></script>
+</body>
+</html>

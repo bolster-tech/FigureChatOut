@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drayco Gameshow - Figure Chat Out | Host Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   BROADCAST CONTROL ROOM THEME — Figure Chat Out Host Panel
+   Palette: Obsidian/Midnight base · Cyan & Amber instrumentation
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  /* ── Surfaces ── */
+  --bg-root:        #090d16;
+  --bg-card:        #111827;
+  --bg-card-2:      #1a2234;
+  --bg-input:       #0d1420;
+  --border-card:    #2a364f;
+  --border-subtle:  #1e2c40;
+
+  /* ── Brand Accents ── */
+  --cyan:           #00d4ff;
+  --cyan-dim:       #00a0c8;
+  --cyan-glow:      rgba(0, 212, 255, 0.18);
+  --amber:          #ffb700;
+  --amber-glow:     rgba(255, 183, 0, 0.18);
+  --green-live:     #00ff88;
+  --green-glow:     rgba(0, 255, 136, 0.22);
+  --pink:           #f472b6;
+  --red-alert:      #ff3b3b;
+
+  /* ── Typography ── */
+  --text-primary:   #f0f6ff;
+  --text-secondary: #8ba3c7;
+  --text-muted:     #4a6080;
+  --text-live:      #00d4ff;
+
+  /* ── Shadows & Glows ── */
+  --shadow-card:    0 4px 24px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.03) inset;
+  --shadow-btn:     0 2px 8px rgba(0,0,0,0.4);
+  --glow-cyan:      0 0 12px rgba(0, 212, 255, 0.4), 0 0 24px rgba(0, 212, 255, 0.15);
+  --glow-green:     0 0 14px rgba(0, 255, 136, 0.5), 0 0 28px rgba(0, 255, 136, 0.2);
+  --glow-amber:     0 0 10px rgba(255, 183, 0, 0.45), 0 0 20px rgba(255, 183, 0, 0.15);
+
+  /* ── Radius ── */
+  --r-card: 10px;
+  --r-btn:  6px;
+  --r-input: 6px;
+
+  /* ── Monospace ── */
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', ui-monospace, 'SFMono-Regular', monospace;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100vw; height: 100vh; max-height: 100vh;
+  background: var(--bg-root);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  overflow: hidden;
+}
+
+/* ════════════════════════════════
+   LAYOUT
+   ════════════════════════════════ */
+.host-dashboard-layout {
+  width: 100vw; height: 100vh; max-height: 100vh;
+  display: flex; flex-direction: column;
+  padding: 1.2vh 1.6vw; gap: 1vh;
+  overflow: hidden;
+}
+.dashboard-columns {
+  flex: 1 1 auto; min-height: 0;
+  display: grid; grid-template-columns: 1fr 1.3fr;
+  gap: 1.2vw; overflow: hidden;
+}
+.col-left, .col-right {
+  display: flex; flex-direction: column;
+  gap: 1vh; min-height: 0; overflow: hidden;
+}
+
+/* ════════════════════════════════
+   TOP BAR
+   ════════════════════════════════ */
+.top-bar {
+  flex: 0 0 auto;
+  display: flex; justify-content: space-between; align-items: center;
+  background: linear-gradient(135deg, #111827 0%, #0f1d2e 100%);
+  border: 1px solid var(--border-card);
+  border-top: 1px solid rgba(0, 212, 255, 0.25);
+  border-radius: var(--r-card);
+  padding: 0.75vh 1.4vw;
+  box-shadow: var(--shadow-card);
+}
+.brand-group { display: flex; align-items: baseline; gap: 0.75rem; }
+.show-franchise {
+  font-family: var(--font-mono); font-size: clamp(0.6rem, 1.1vh, 0.78rem);
+  font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--cyan); text-shadow: 0 0 8px rgba(0,212,255,0.4);
+}
+.app-title {
+  font-size: clamp(1rem, 2vh, 1.35rem); font-weight: 800;
+  letter-spacing: -0.02em; color: var(--text-primary);
+  display: flex; align-items: center; gap: 0.4rem;
+}
+.app-title strong { color: var(--pink); }
+.app-badge {
+  font-family: var(--font-mono); font-size: clamp(0.55rem, 1vh, 0.68rem);
+  font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+  background: rgba(0, 212, 255, 0.12); color: var(--cyan);
+  border: 1px solid rgba(0, 212, 255, 0.35);
+  padding: 0.18rem 0.5rem; border-radius: 4px;
+}
+
+/* ── Status Indicator ── */
+.status-badge {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  font-family: var(--font-mono); font-size: clamp(0.6rem, 1.1vh, 0.72rem);
+  font-weight: 700; letter-spacing: 0.08em;
+  padding: 0.3vh 0.8vw; border-radius: 9999px;
+  background: rgba(0,0,0,0.3); border: 1px solid var(--border-card);
+}
+.status-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--amber); box-shadow: var(--glow-amber);
+  animation: pulse-amber 2s ease-in-out infinite;
+}
+.status-dot.connected {
+  background: var(--green-live); box-shadow: var(--glow-green);
+  animation: pulse-green 2s ease-in-out infinite;
+}
+.status-dot.disconnected { background: var(--red-alert); animation: none; box-shadow: none; }
+
+@keyframes pulse-amber {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--amber); }
+  50% { opacity: 0.6; box-shadow: 0 0 12px var(--amber); }
+}
+@keyframes pulse-green {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--green-live); }
+  50% { opacity: 0.7; box-shadow: 0 0 14px var(--green-live); }
+}
+
+/* ════════════════════════════════
+   CARDS
+   ════════════════════════════════ */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--r-card);
+  padding: 1.1vh 1.1vw;
+  box-shadow: var(--shadow-card);
+  display: flex; flex-direction: column; min-height: 0;
+  position: relative;
+}
+/* top accent line */
+.card::before {
+  content: '';
+  position: absolute; top: 0; left: 1rem; right: 1rem; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,212,255,0.3), transparent);
+  border-radius: 99px;
+}
+.card-header-row {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 0.7vh;
+}
+.card-title {
+  font-family: var(--font-mono); font-size: clamp(0.68rem, 1.3vh, 0.82rem);
+  font-weight: 800; text-transform: uppercase; letter-spacing: 0.14em;
+  color: var(--cyan);
+}
+
+/* ════════════════════════════════
+   FORM CONTROLS
+   ════════════════════════════════ */
+.text-input, .number-input {
+  width: 100%; padding: 0.55vh 0.55vw;
+  font-family: var(--font-sans); font-size: clamp(0.75rem, 1.3vh, 0.9rem);
+  background: var(--bg-input); color: var(--text-primary);
+  border: 1px solid var(--border-card); border-radius: var(--r-input);
+  outline: none; transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.text-input:focus, .number-input:focus {
+  border-color: var(--cyan-dim);
+  box-shadow: 0 0 0 2px rgba(0,212,255,0.18);
+}
+.text-input::placeholder { color: var(--text-muted); }
+
+label, .form-group label, .panelist-input-label {
+  font-family: var(--font-mono); font-size: clamp(0.58rem, 1vh, 0.68rem);
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--text-secondary);
+}
+
+/* ════════════════════════════════
+   PANELIST TURN SWITCHER
+   ════════════════════════════════ */
+.panelist-inputs-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 0.5vw; margin-bottom: 0.7vh;
+}
+.panelist-input-box { display: flex; flex-direction: column; gap: 0.25vh; }
+.panelist-input-label {
+  font-family: var(--font-mono); font-size: clamp(0.58rem, 1vh, 0.67rem);
+  font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+  display: flex; align-items: center; gap: 0.25rem; color: var(--text-secondary);
+}
+
+/* Slot tags */
+.slot-tag {
+  font-family: var(--font-mono); font-size: 0.6rem; font-weight: 800;
+  padding: 0.06rem 0.35rem; border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.15);
+  letter-spacing: 0.05em;
+}
+
+/* Turn Switcher Buttons */
+.turn-buttons-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 0.5vw; margin-bottom: 0.6vh;
+}
+.btn-turn {
+  background: var(--bg-card-2);
+  border: 1px solid var(--border-card);
+  border-radius: var(--r-btn);
+  padding: 0.65vh 0.4vw;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 0.2vh;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  position: relative; overflow: hidden;
+}
+.btn-turn:hover {
+  transform: translateY(-2px);
+  border-color: var(--cyan-dim);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 8px rgba(0,212,255,0.12);
+  background: #1f2d44;
+}
+.btn-turn-name {
+  font-size: clamp(0.72rem, 1.3vh, 0.88rem); font-weight: 800;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+  color: var(--text-primary);
+}
+.btn-turn-badge {
+  font-family: var(--font-mono); font-size: 0.58rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 0.05rem 0.35rem; border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+  background: rgba(255,255,255,0.04); color: var(--text-muted);
+}
+
+/* Active turn — neon green snap */
+.btn-turn.active-turn {
+  background: rgba(0, 255, 136, 0.1);
+  border-color: var(--green-live);
+  box-shadow: var(--glow-green), inset 0 0 20px rgba(0,255,136,0.05);
+  transform: translateY(-1px);
+}
+.btn-turn.active-turn .btn-turn-name { color: var(--green-live); }
+.btn-turn.active-turn .btn-turn-badge {
+  background: rgba(0,255,136,0.15); border-color: var(--green-live);
+  color: var(--green-live);
+}
+
+/* Turn footer */
+.turn-controls-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 0.5vh; border-top: 1px solid var(--border-subtle);
+}
+.turn-status-text {
+  font-family: var(--font-mono); font-size: clamp(0.65rem, 1.1vh, 0.78rem);
+  font-weight: 700; color: var(--green-live); letter-spacing: 0.06em;
+}
+.turn-actions { display: flex; gap: 0.4vw; }
+
+/* ════════════════════════════════
+   BUTTONS
+   ════════════════════════════════ */
+button {
+  font-family: var(--font-sans); font-weight: 800; cursor: pointer;
+  border: none; transition: transform 0.13s ease, filter 0.13s ease, box-shadow 0.13s ease;
+}
+button:hover { transform: translateY(-1px); filter: brightness(1.12); }
+button:active { transform: translateY(0px); filter: brightness(0.96); }
+
+/* Sub-action turn buttons */
+.btn-turn-sub {
+  background: var(--bg-card-2); color: var(--text-primary);
+  border: 1px solid var(--border-card); border-radius: var(--r-btn);
+  padding: 0.3vh 0.65vw;
+  font-family: var(--font-mono); font-size: clamp(0.64rem, 1.1vh, 0.74rem);
+  font-weight: 700; letter-spacing: 0.05em;
+  box-shadow: var(--shadow-btn);
+}
+.btn-turn-sub:hover { border-color: var(--cyan-dim); }
+
+/* Contestant / setup inputs */
+.input-row-contestant { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6vw; }
+.form-group { display: flex; flex-direction: column; gap: 0.25vh; }
+
+/* ── Timer ── */
+.timer-row { display: flex; justify-content: space-between; align-items: center; gap: 0.8vw; }
+.timer-digits {
+  font-family: var(--font-mono);
+  font-size: clamp(1.3rem, 2.8vh, 1.9rem); font-weight: 800; letter-spacing: 0.08em;
+  color: var(--cyan); background: rgba(0,212,255,0.06);
+  border: 1px solid rgba(0,212,255,0.3); border-radius: 8px;
+  padding: 0.15vh 0.6vw;
+  text-shadow: 0 0 12px rgba(0,212,255,0.4);
+  box-shadow: inset 0 0 16px rgba(0,212,255,0.05);
+}
+.timer-digits.urgent {
+  color: var(--red-alert); background: rgba(255,59,59,0.08);
+  border-color: rgba(255,59,59,0.5); text-shadow: 0 0 12px rgba(255,59,59,0.6);
+  animation: timerBeep 0.7s infinite alternate;
+}
+@keyframes timerBeep {
+  0%   { opacity: 1; box-shadow: 0 0 12px rgba(255,59,59,0.3); }
+  100% { opacity: 0.8; box-shadow: 0 0 20px rgba(255,59,59,0.6); }
+}
+.timer-controls-compact { display: flex; align-items: center; gap: 0.4vw; flex-wrap: wrap; }
+
+.btn-preset {
+  background: var(--bg-card-2); color: var(--text-secondary);
+  border: 1px solid var(--border-card); border-radius: var(--r-btn);
+  padding: 0.38vh 0.5vw;
+  font-family: var(--font-mono); font-size: clamp(0.64rem, 1.1vh, 0.76rem);
+  font-weight: 700; letter-spacing: 0.06em; box-shadow: var(--shadow-btn);
+}
+.btn-preset.active {
+  background: rgba(0,212,255,0.12); color: var(--cyan);
+  border-color: var(--cyan-dim); box-shadow: 0 0 8px rgba(0,212,255,0.25);
+}
+.btn-timer {
+  padding: 0.42vh 0.65vw;
+  font-family: var(--font-mono); font-size: clamp(0.68rem, 1.2vh, 0.8rem);
+  font-weight: 700; border-radius: var(--r-btn);
+  box-shadow: var(--shadow-btn); letter-spacing: 0.04em;
+}
+.btn-start { background: rgba(0,255,136,0.12); color: var(--green-live); border: 1px solid rgba(0,255,136,0.4); }
+.btn-start:hover { box-shadow: var(--glow-green); }
+.btn-pause { background: rgba(255,183,0,0.12); color: var(--amber); border: 1px solid rgba(255,183,0,0.4); }
+.btn-pause:hover { box-shadow: var(--glow-amber); }
+.btn-reset { background: var(--bg-card-2); color: var(--text-secondary); border: 1px solid var(--border-card); }
+
+/* ── Sentence / Board Setup ── */
+.input-row-sentence { display: grid; grid-template-columns: 1fr 90px 140px; gap: 0.5vw; align-items: end; }
+.btn-submit {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  color: #fff; border: 1px solid rgba(139,92,246,0.5);
+  border-radius: var(--r-btn); padding: 0.6vh 0.6vw;
+  font-size: clamp(0.72rem, 1.3vh, 0.84rem); font-weight: 800;
+  box-shadow: 0 2px 12px rgba(109,40,217,0.4);
+  letter-spacing: 0.04em;
+}
+.btn-submit:hover { box-shadow: 0 4px 20px rgba(139,92,246,0.55); }
+
+/* ── Word Controls 2x4 Grid ── */
+.words-card { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.batch-actions { display: flex; gap: 0.4vw; }
+.btn-batch {
+  border: 1px solid var(--border-card); border-radius: var(--r-btn);
+  padding: 0.3vh 0.6vw;
+  font-family: var(--font-mono); font-size: clamp(0.62rem, 1.1vh, 0.72rem);
+  font-weight: 700; letter-spacing: 0.06em; box-shadow: var(--shadow-btn);
+}
+.btn-reveal-all {
+  background: rgba(0,255,136,0.1); color: var(--green-live);
+  border-color: rgba(0,255,136,0.35);
+}
+.btn-reveal-all:hover { box-shadow: var(--glow-green); }
+.btn-hide-all { background: var(--bg-card-2); color: var(--text-secondary); }
+
+.words-grid-2x4 {
+  flex: 1 1 auto; min-height: 0;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 0.5vw 0.5vw; margin-top: 0.6vh;
+}
+.word-card-host {
+  background: var(--bg-card-2); border: 1px solid var(--border-card);
+  border-radius: var(--r-btn); padding: 0.4vh 0.4vw;
+  display: flex; flex-direction: column; justify-content: space-between;
+  gap: 0.3vh; transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.word-card-host:hover { border-color: var(--border-card); }
+.word-card-host.is-revealed {
+  background: rgba(0,255,136,0.06); border-color: rgba(0,255,136,0.4);
+  box-shadow: 0 0 10px rgba(0,255,136,0.1);
+}
+.word-card-top { display: flex; align-items: center; gap: 0.3vw; }
+.word-badge {
+  font-family: var(--font-mono); font-size: 0.58rem; font-weight: 800;
+  background: rgba(255,255,255,0.06); border: 1px solid var(--border-subtle);
+  border-radius: 4px; padding: 0.08rem 0.28rem; flex-shrink: 0;
+  color: var(--text-secondary); letter-spacing: 0.06em;
+}
+.word-card-host.is-revealed .word-badge {
+  background: rgba(0,255,136,0.15); border-color: rgba(0,255,136,0.4);
+  color: var(--green-live);
+}
+.word-input {
+  width: 100%; padding: 0.28vh 0.38vw;
+  font-family: var(--font-sans); font-size: clamp(0.72rem, 1.2vh, 0.84rem); font-weight: 700;
+  background: rgba(0,0,0,0.3); color: var(--text-primary);
+  border: 1px solid var(--border-subtle); border-radius: 4px; outline: none;
+  transition: border-color 0.15s;
+}
+.word-input:focus { border-color: var(--cyan-dim); }
+.reveal-btn {
+  width: 100%;
+  background: rgba(0,212,255,0.1); color: var(--cyan);
+  border: 1px solid rgba(0,212,255,0.3); border-radius: 4px;
+  padding: 0.38vh 0.2vw;
+  font-family: var(--font-mono); font-size: clamp(0.62rem, 1.1vh, 0.72rem);
+  font-weight: 700; letter-spacing: 0.05em;
+  cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: all 0.15s ease;
+}
+.reveal-btn:hover { box-shadow: 0 0 8px rgba(0,212,255,0.3); }
+.reveal-btn.revealed {
+  background: rgba(0,255,136,0.12); color: var(--green-live);
+  border-color: rgba(0,255,136,0.35);
+}
+.reveal-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.hint-control {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.25vw;
+  align-items: center;
+}
+
+.hint-input {
+  min-width: 0;
+  width: 100%;
+  padding: 0.28vh 0.38vw;
+  font-family: var(--font-sans);
+  font-size: clamp(0.58rem, 1vh, 0.68rem);
+  background: rgba(0,0,0,0.3);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  outline: none;
+}
+
+.hint-input:focus {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 1px rgba(255,183,0,0.25);
+}
+
+.hint-input::placeholder {
+  color: var(--text-muted);
+}
+
+.hint-toggle-btn {
+  padding: 0.28vh 0.38vw;
+  background: rgba(255,183,0,0.1);
+  color: var(--amber);
+  border: 1px solid rgba(255,183,0,0.35);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: clamp(0.54rem, 0.95vh, 0.65rem);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.hint-toggle-btn.is-active {
+  background: rgba(0,255,136,0.12);
+  color: var(--green-live);
+  border-color: rgba(0,255,136,0.4);
+}
+
+.hint-toggle-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ── Log Panel ── */
+.log-panel-compact {
+  flex: 0 0 auto; background: rgba(0,0,0,0.35); border: 1px solid var(--border-subtle);
+  border-radius: var(--r-btn); padding: 0.35vh 0.8vw;
+  font-family: var(--font-mono); font-size: clamp(0.6rem, 1vh, 0.7rem);
+  display: flex; align-items: center; gap: 0.5rem; max-height: 4vh; overflow: hidden;
+}
+.log-label { font-weight: 800; flex-shrink: 0; color: var(--text-secondary); letter-spacing: 0.08em; }
+.log-payload { color: var(--pink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+</style>
+</head>
+<body>
+  <main class="host-dashboard-layout">
+    <!-- Top Bar: Drayco Gameshow Branding & Status -->
+    <header class="top-bar">
+      <div class="brand-group">
+        <span class="show-franchise">Drayco Gameshow</span>
+        <h1 class="app-title">
+          <span>Figure <strong>Chat</strong> Out</span>
+          <span class="app-badge">Host Panel</span>
+        </h1>
+      </div>
+      <div class="status-badge" id="statusBadge" aria-live="polite">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">Connecting...</span>
+      </div>
+    </header>
+
+    <!-- Main 2-Column Responsive Dashboard (Zero Scrolling) -->
+    <div class="dashboard-columns">
+      <!-- LEFT COLUMN: Panelists, Contestant, Timer -->
+      <div class="col-left">
+        <!-- 1. Panelist Roster & Turn Switcher -->
+        <section class="card" aria-labelledby="panelistHeading">
+          <div class="card-header-row">
+            <h2 id="panelistHeading" class="card-title">1. Panelist Turn Switcher</h2>
+            <span class="app-badge" style="background: var(--pastel-mint);">Overlay Active</span>
+          </div>
+
+          <!-- 4 Panelist Name Config Inputs -->
+          <div class="panelist-inputs-grid">
+            <div class="panelist-input-box">
+              <label class="panelist-input-label" for="panelistInput0">
+                <span class="slot-tag" style="background: var(--pastel-mint);">P1</span> Panelist 1
+              </label>
+              <input type="text" id="panelistInput0" class="text-input" value="Panelist 1">
+            </div>
+            <div class="panelist-input-box">
+              <label class="panelist-input-label" for="panelistInput1">
+                <span class="slot-tag" style="background: var(--pastel-pink);">P2</span> Panelist 2
+              </label>
+              <input type="text" id="panelistInput1" class="text-input" value="Panelist 2">
+            </div>
+            <div class="panelist-input-box">
+              <label class="panelist-input-label" for="panelistInput2">
+                <span class="slot-tag" style="background: var(--pastel-blue);">P3</span> Panelist 3
+              </label>
+              <input type="text" id="panelistInput2" class="text-input" value="Panelist 3">
+            </div>
+            <div class="panelist-input-box">
+              <label class="panelist-input-label" for="panelistInput3">
+                <span class="slot-tag" style="background: var(--pastel-yellow);">P4</span> Panelist 4
+              </label>
+              <input type="text" id="panelistInput3" class="text-input" value="Panelist 4">
+            </div>
+          </div>
+
+          <!-- Interactive Turn Switcher Buttons -->
+          <div class="turn-buttons-grid">
+            <button type="button" class="btn-turn" id="turnBtn0" data-index="0">
+              <span class="slot-tag">P1</span>
+              <span class="btn-turn-name" id="turnName0">Panelist 1</span>
+              <span class="btn-turn-badge">Floor</span>
+            </button>
+            <button type="button" class="btn-turn" id="turnBtn1" data-index="1">
+              <span class="slot-tag">P2</span>
+              <span class="btn-turn-name" id="turnName1">Panelist 2</span>
+              <span class="btn-turn-badge">Floor</span>
+            </button>
+            <button type="button" class="btn-turn" id="turnBtn2" data-index="2">
+              <span class="slot-tag">P3</span>
+              <span class="btn-turn-name" id="turnName2">Panelist 3</span>
+              <span class="btn-turn-badge">Floor</span>
+            </button>
+            <button type="button" class="btn-turn" id="turnBtn3" data-index="3">
+              <span class="slot-tag">P4</span>
+              <span class="btn-turn-name" id="turnName3">Panelist 4</span>
+              <span class="btn-turn-badge">Floor</span>
+            </button>
+          </div>
+
+          <div class="turn-controls-footer">
+            <span class="turn-status-text" id="activeTurnStatus">Active: None</span>
+            <div class="turn-actions">
+              <button type="button" class="btn-turn-sub" id="nextTurnBtn">Next Turn ➔</button>
+              <button type="button" class="btn-turn-sub" id="clearTurnBtn">Clear Floor</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. Contestant Name & Category -->
+        <section class="card" aria-labelledby="contestantHeading">
+          <div class="card-header-row">
+            <h2 id="contestantHeading" class="card-title">2. Chatter & Secret Category</h2>
+            <span class="app-badge" style="background: var(--pastel-lavender);">Live Clue</span>
+          </div>
+          <div class="input-row-contestant">
+            <div class="form-group">
+              <label for="chatterNameInput">Chatter Name</label>
+              <input type="text" id="chatterNameInput" class="text-input" placeholder="e.g. @PixelGamer">
+            </div>
+            <div class="form-group">
+              <label for="categoryHintInput">Category / Hint</label>
+              <input type="text" id="categoryHintInput" class="text-input" placeholder="e.g. FOOD OBSESSION">
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. Round Countdown Timer -->
+        <section class="card" aria-labelledby="timerHeading">
+          <div class="card-header-row">
+            <h2 id="timerHeading" class="card-title">3. Round Timer</h2>
+            <div class="timer-digits" id="timerDisplay">01:00</div>
+          </div>
+          <div class="timer-row">
+            <div class="timer-controls-compact">
+              <button type="button" class="btn-preset active" id="preset60Btn">60s</button>
+              <button type="button" class="btn-preset" id="preset90Btn">90s</button>
+              <input type="number" id="customTimerInput" class="number-input" style="width: 55px; padding: 0.3vh;" min="5" max="300" value="60" title="Sec">
+            </div>
+            <div class="timer-controls-compact">
+              <button type="button" id="startTimerBtn" class="btn-timer btn-start">Start</button>
+              <button type="button" id="pauseTimerBtn" class="btn-timer btn-pause" disabled>Pause</button>
+              <button type="button" id="resetTimerBtn" class="btn-timer btn-reset">Reset</button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- RIGHT COLUMN: 2x4 Board Setup & Word Controls -->
+      <div class="col-right">
+        <!-- 4. Configure Board Size -->
+        <section class="card" aria-labelledby="setupHeading">
+          <div class="card-header-row">
+            <h2 id="setupHeading" class="card-title">4. Configure Secret Sentence</h2>
+            <span class="app-badge" style="background: var(--pastel-pink);">2x4 Layout (Up to 8)</span>
+          </div>
+          <form id="setupForm" onsubmit="return false;">
+            <div class="input-row-sentence">
+              <div class="form-group">
+                <label for="sentenceInput">Secret Sentence</label>
+                <input type="text" id="sentenceInput" class="text-input" placeholder="e.g. DRAYCO GAMESHOW FIGURE CHAT OUT SECRET PHRASE REVEAL">
+              </div>
+              <div class="form-group">
+                <label for="wordCountInput">Boxes (3-8)</label>
+                <input type="number" id="wordCountInput" class="number-input" min="3" max="8" value="8" required>
+              </div>
+              <button type="submit" id="submitSetupBtn" class="btn-submit">Generate Board</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- 5. Word Controls: 2x4 Grid -->
+        <section class="card words-card" aria-labelledby="wordsHeading">
+          <div class="card-header-row">
+            <h2 id="wordsHeading" class="card-title">5. Word Controls (2x4 Grid)</h2>
+            <div class="batch-actions">
+              <button type="button" id="revealAllBtn" class="btn-batch btn-reveal-all">Reveal All</button>
+              <button type="button" id="hideAllBtn" class="btn-batch btn-hide-all">Hide All</button>
+            </div>
+          </div>
+
+          <!-- 2x4 Grid of Word Controls -->
+          <div id="wordsList" class="words-grid-2x4" role="list">
+            <!-- Rendered dynamically by host.js in 2 rows x 4 columns -->
+          </div>
+        </section>
+
+        <!-- Live Log -->
+        <div class="log-panel-compact" aria-live="polite">
+          <span class="log-label">Last Sent:</span>
+          <span id="lastSentPayload" class="log-payload">None</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="host.js" defer></script>
+</body>
+</html>
