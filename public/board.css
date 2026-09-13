@@ -1,37 +1,47 @@
 /* ==========================================================================
    Drayco Gameshow – Figure Chat Out  ·  BOARD DISPLAY
-   Clean, rigid, high-contrast studio theme
+   90s Nickelodeon Theme: dark arcade backdrop, static small orange wiggle
+   pattern, chunky cartoon typography.
+   BOARD IS STRICTLY READ-ONLY (see lock section at the bottom).
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Inter:wght@400;600;700;800;900&display=swap');
 
 /* ── Design Tokens ─────────────────────────────────────────────────────── */
 :root {
-  --bg-canvas:     #e8ecf2;        /* cool-gray studio backdrop */
+  /* Dark Arcade Backdrop */
+  --bg-canvas:     #10142a;        /* deep arcade navy */
+  --bg-deep:       #05070f;        /* vignette edge */
+  --bg-panel:      #141b34;        /* dark panel fill */
+
+  /* 90s Nick Accents */
+  --nick-green:    #00FF66;        /* slime green */
+  --nick-blue:     #00CCFF;        /* splash blue */
+
   --ink:           #111111;
   --white:         #ffffff;
 
   /* Header */
-  --title-fill:    #22c55e;        /* green fill */
-  
+  --title-fill:    var(--nick-green);
+
   /* Panelist Pastels */
   --pastel-blue:   #dbeafe;
   --pastel-pink:   #fce7f3;
   --pastel-purple: #f3e8ff;
   --pastel-orange: #ffedd5;
   --active-warm:   #fef08a;        /* warm pastel accent fill */
-  
+
   /* Grid Vibrant Nick Colors */
   --tile-pink:     #ec4899; /* hot magenta */
-  --tile-blue:     #0ea5e9; /* splash blue */
-  --tile-mint:     #84cc16; /* slime green */
+  --tile-blue:     #00CCFF; /* splash blue */
+  --tile-mint:     #00FF66; /* slime green */
   --tile-orange:   #f97316; /* electric orange */
 
   /* Borders & Shadows */
   --outline-thin:  2px;
   --outline-thick: 4px;
-  --shadow-heavy:  6px 6px 0px var(--ink);
-  --shadow-active: 10px 10px 0px var(--ink);
+  --shadow-heavy:  6px 6px 0px rgba(0, 0, 0, 0.9);
+  --shadow-active: 10px 10px 0px rgba(0, 0, 0, 0.9);
 
   /* Fonts */
   --font-chunky:   'Luckiest Guy', cursive, Impact, sans-serif;
@@ -47,12 +57,48 @@ html, body {
   overflow: hidden;
   font-family: var(--font-sans);
   background-color: var(--bg-canvas);
+  /* Dark arcade glow: blue wash up top, slime wash below */
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(0, 204, 255, 0.14) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 100%, rgba(0, 255, 102, 0.10) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 50%, transparent 55%, var(--bg-deep) 100%);
   color: var(--ink);
+}
+
+/* ── 90s Nick Wiggle Pattern (STATIC, small orange squiggles — no animation) */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='70'%20height='70'%20viewBox='0%200%2070%2070'%3E%3Cpath%20d='M-10%2020%20Q%205%208%2020%2020%20T%2050%2020%20T%2080%2020'%20fill='none'%20stroke='%23FF7A00'%20stroke-width='5'%20stroke-linecap='round'/%3E%3Cpath%20d='M-10%2055%20Q%205%2043%2020%2055%20T%2050%2055%20T%2080%2055'%20fill='none'%20stroke='%23FF7A00'%20stroke-width='5'%20stroke-linecap='round'/%3E%3C/svg%3E");
+  background-size: 70px 70px;
+  background-repeat: repeat;
+  opacity: 0.22;
+}
+
+/* Subtle arcade scanlines over the pattern */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.18) 0px,
+    rgba(0, 0, 0, 0.18) 2px,
+    transparent 2px,
+    transparent 5px
+  );
+  opacity: 0.35;
 }
 
 /* ── Board Wrapper ─────────────────────────────────────────────────────── */
 .board-wrapper {
   position: relative;
+  z-index: 1; /* sits above the wiggle pattern + scanlines */
   width: 100vw; height: 100vh;
   display: flex; flex-direction: column;
   padding: 2vh 3vw;
@@ -121,19 +167,26 @@ html, body {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.28em;
-  color: #4b5563;
+  color: var(--nick-blue);
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
   margin-bottom: 2px;
 }
 
+/* Main game title: LARGE, crisp 2px solid black outline, chunky shadow */
 .marquee-title {
   font-family: var(--font-chunky);
-  font-size: clamp(48px, 6.5vh, 62px);
+  font-size: clamp(54px, 9vh, 96px);
   font-weight: 900;
   letter-spacing: 0.02em;
   color: var(--title-fill);
-  -webkit-text-stroke: 3.5px var(--ink);
-  text-shadow: 6px 6px 0px var(--ink);
   line-height: 1;
+  /* Crisp 2px solid black outline (stroke painted behind the fill) */
+  -webkit-text-stroke: 2px #000000;
+  paint-order: stroke fill;
+  /* Chunky stacked shadow: hard black kick + splash-blue slab */
+  text-shadow:
+    4px 4px 0px #000000,
+    9px 9px 0px var(--nick-blue);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -154,8 +207,9 @@ html, body {
   font-size: clamp(11px, 1.5vh, 13px);
   font-weight: 800;
   text-transform: uppercase;
-  color: #4b5563;
+  color: rgba(255, 255, 255, 0.82);
   letter-spacing: 0.1em;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
 }
 
 .panelist-roster {
@@ -304,6 +358,7 @@ html, body {
   text-transform: uppercase;
   color: var(--white);
   -webkit-text-stroke: 1.5px var(--ink);
+  paint-order: stroke fill;
   text-shadow: 4px 4px 0px var(--ink);
   letter-spacing: 0.04em;
   line-height: 1;
@@ -313,10 +368,19 @@ html, body {
   text-align: center;
 }
 
+/* Mystery cover: dark arcade panel with faint Nick stripe texture */
 .mystery-cover {
   position: absolute; inset: 0; z-index: 2;
   display: flex; align-items: center; justify-content: center;
-  background: #f8fafc; /* pale pastel/white */
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(0, 255, 102, 0.06) 0px,
+      rgba(0, 255, 102, 0.06) 14px,
+      rgba(0, 204, 255, 0.06) 14px,
+      rgba(0, 204, 255, 0.06) 28px
+    ),
+    var(--bg-panel);
   transition: transform 0.4s ease, opacity 0.3s ease;
 }
 
@@ -324,10 +388,12 @@ html, body {
   display: flex; align-items: center; justify-content: center;
   width: 54px; height: 54px;
   border-radius: 50%;
-  border: var(--outline-thick) solid var(--ink);
+  border: var(--outline-thick) solid #000000;
+  background: var(--nick-green);
+  box-shadow: 3px 3px 0px #000000;
   font-size: 24px;
   font-weight: 900;
-  color: var(--ink);
+  color: #000000;
 }
 
 .word-row.revealed .mystery-cover {
@@ -409,7 +475,7 @@ html, body {
   border: var(--outline-thin) solid var(--ink);
   border-radius: 20px;
   padding: 6px 12px;
-  box-shadow: 4px 4px 0px var(--ink);
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.9);
   font-size: 12px;
   font-weight: 800;
   margin-bottom: 8px;
@@ -417,7 +483,17 @@ html, body {
 
 .status-dot {
   width: 10px; height: 10px; border-radius: 50%;
-  background: #22c55e;
+  background: #9ca3af;
+}
+
+.status-dot.connected {
+  background: var(--nick-green);
+  box-shadow: 0 0 6px var(--nick-green);
+}
+
+.status-dot.disconnected {
+  background: #ef4444;
+  box-shadow: 0 0 6px #ef4444;
 }
 
 /* Timer Box */
@@ -430,6 +506,15 @@ html, body {
   display: flex; flex-direction: column; align-items: center;
 }
 
+.timer-box.urgent {
+  animation: urgentPulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes urgentPulse {
+  from { box-shadow: var(--shadow-heavy); }
+  to   { box-shadow: 0px 0px 0px 4px #ef4444, var(--shadow-heavy); }
+}
+
 .timer-display {
   font-family: var(--font-mono);
   font-size: clamp(28px, 4vh, 32px);
@@ -437,4 +522,23 @@ html, body {
   color: var(--ink);
   font-variant-numeric: tabular-nums;
   line-height: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   STRICT READ-ONLY LOCK (BOARD VIEWER)
+   Viewers can NEVER click, select, drag, or unreveal board boxes.
+   Enforced here in CSS and again inline via board.js (belt & suspenders).
+   ═══════════════════════════════════════════════════════════════════════ */
+.game-board-container,
+.game-board,
+.game-board *,
+.game-board *::before,
+.game-board *::after {
+  pointer-events: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+  cursor: default !important;
 }

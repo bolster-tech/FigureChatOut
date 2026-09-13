@@ -11,6 +11,28 @@
   const clueBox = document.getElementById('clueBox');
   const boardWordHint = document.getElementById('boardWordHint');
 
+  // ==========================================================================
+  // STRICT READ-ONLY LOCK: viewers can NEVER click or unreveal board boxes.
+  // Belt-and-suspenders companion to the CSS lock in board.css.
+  // ==========================================================================
+  const BLOCKED_BOARD_EVENTS = [
+    'click', 'dblclick', 'mousedown', 'mouseup',
+    'pointerdown', 'pointerup', 'touchstart', 'touchend',
+    'contextmenu', 'keydown'
+  ];
+  (function enforceBoardReadOnly() {
+    if (!gameBoard) return;
+    gameBoard.style.pointerEvents = 'none';
+    gameBoard.style.userSelect = 'none';
+    gameBoard.style.webkitUserSelect = 'none';
+    BLOCKED_BOARD_EVENTS.forEach((type) => {
+      gameBoard.addEventListener(type, (event) => {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }, { capture: true, passive: false });
+    });
+  })();
+
   let ws = null;
   let reconnectTimer = null;
   let audioCtx = null;
@@ -306,10 +328,10 @@
         </div>
       `;
 
-      // Interactive preview toggle
-row.addEventListener('click', () => {
-  // Click events are disabled on the board tiles
-});
+      // Strict read-only enforcement: tiles are display-only (no click/reveal)
+      row.style.pointerEvents = 'none';
+      row.style.userSelect = 'none';
+      row.style.webkitUserSelect = 'none';
 
       gameBoard.appendChild(row);
     }
